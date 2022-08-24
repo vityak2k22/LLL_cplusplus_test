@@ -1,17 +1,20 @@
 #include "LLL.h"
 
 int main () {
-	out << "LLL algorithm (my code describing <double>)\n\n";
+    ifstream in("input.txt");
+    ofstream out("output.txt");
+    
+    out << "LLL algorithm (my code describing <double>)\n\n";
     long long m, n;
     in >> m >> n;
     Matrix X(m, n), Y(m, n);
     out << "A matrix " << m << "x" << n << endl;
-    X.write();
+    X.write(in);
     out << "Input matrix:\n";
-    X.print();
+    X.print(out);
     LLL(Y);
     out << "\nReduced matrix:\n";
-    Y.print();
+    Y.print(out);
     in.close();
     out.close();
 	system("pause");
