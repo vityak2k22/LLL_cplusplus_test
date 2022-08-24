@@ -9,8 +9,8 @@
 
 using namespace std;
 
-ifstream in("input.txt");
-ofstream out("output.txt");
+class Matrix;
+void LLL(Matrix& X, double delta = 0.75);
 
 class Matrix {
     double** array;
@@ -18,14 +18,14 @@ class Matrix {
 public:
 	Matrix(long long size_m, long long size_n);
 	Matrix(const Matrix& other);
-    void write();
-	void print();
+    void write(istream &in);
+	void print(ostream &out);
 	Matrix& operator = (const Matrix& other);
 	double ScalarProduct(Matrix Y, long long index1, long long index2);
 	double Norm(long long index);
 	void Swap(long long index1, long long index2);
 	Matrix ortho_GS(Matrix& coeff);
-	friend void LLL(Matrix& X, double delta = 0.75);
+	friend void LLL(Matrix& X, double delta);
 	~Matrix();
 };
 
