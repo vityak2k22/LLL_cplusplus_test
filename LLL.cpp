@@ -1,5 +1,7 @@
 #include "LLL.h"
 
+
+
 Matrix::Matrix(long long size_m, long long size_n) {
     this->size_m = size_m;
     this->size_n = size_n;
@@ -46,14 +48,14 @@ Matrix::Matrix(const Matrix& other) {
     }
 }
 
-void Matrix::write() {
+void Matrix::write(istream &in) {
     for (long long i = 0; i < size_m; i++) {
         for (long long j = 0; j < size_n; j++)
             in >> array[i][j];
     }
 }
 
-void Matrix::print() {
+void Matrix::print(ostream &out) {
     out << "[";
     for (long long i = 0; i < size_m; i++) {
         out << "[";
@@ -123,7 +125,7 @@ Matrix Matrix::ortho_GS(Matrix& coeff) {
     return Y;
 }
 
-friend void Matrix::LLL(Matrix& X, double delta = 0.75) {
+void LLL(Matrix& X, double delta) {
     Matrix Y(X.size_m, X.size_n);
     Matrix coeff(X.size_m, X.size_m);
     Y = X.ortho_GS(coeff);
