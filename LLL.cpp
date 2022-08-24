@@ -56,21 +56,11 @@ void Matrix::write(istream &in) {
 }
 
 void Matrix::print(ostream &out) {
-    out << "[";
     for (long long i = 0; i < size_m; i++) {
-        out << "[";
-        for (long long j = 0; j < size_n; j++) {
-            if (j == size_n - 1)
-                out << array[i][j];
-            else
-                out << array[i][j] << ", ";
-        }
-        if (i == size_m - 1)
-            out << "]";
-        else
-            out << "], ";
+        for (long long j = 0; j < size_n; j++)
+            out << array[i][j] << " ";
+        out << endl;
     }
-    out << "]";
 }
 
 Matrix& Matrix::operator = (const Matrix& other) {
