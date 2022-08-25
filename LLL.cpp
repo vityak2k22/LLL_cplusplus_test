@@ -1,130 +1,17 @@
 #include "LLL.h"
 
+// --------------------CORE OF PROGRAM--------------------
 
-
-Matrix::Matrix(long long size_m, long long size_n) {
-    this->size_m = size_m;
-    this->size_n = size_n;
-    array = new double* [size_m];
-    if (array == nullptr) {
-        cout << "Memory 1 error\n";
-        system("pause");
-        return;
-    }
-    for (long long i = 0; i < size_m; i++) {
-        array[i] = new double[size_n];
-        if (array[i] == nullptr) {
-            cout << i << "Memory 2 error\n";
-            system("pause");
-            return;
-        }
-    }
-    for (long long i = 0; i < size_m; i++) {
-        for (long long j = 0; j < size_n; j++)
-            array[i][j] = 0;
-    }
-}
-
-Matrix::Matrix(const Matrix& other) {
-    size_m = other.size_m;
-    size_n = other.size_n;
-    array = new double* [size_m];
-    if (array == nullptr) {
-        cout << "Memory 1 error\n";
-        system("pause");
-        return;
-    }
-    for (long long i = 0; i < size_m; i++) {
-        array[i] = new double[size_n];
-        if (array[i] == nullptr) {
-            cout << i << "Memory 2 error\n";
-            system("pause");
-            return;
-        }
-    }
-    for (long long i = 0; i < size_m; i++) {
-        for (long long j = 0; j < size_n; j++)
-            array[i][j] = other.array[i][j];
-    }
-}
-
-void Matrix::write(istream &in) {
-    for (long long i = 0; i < size_m; i++) {
-        for (long long j = 0; j < size_n; j++)
-            in >> array[i][j];
-    }
-}
-
-void Matrix::print(ostream &out) {
-    for (long long i = 0; i < size_m; i++) {
-        for (long long j = 0; j < size_n; j++)
-            out << array[i][j] << " ";
-        out << endl;
-    }
-}
-
-Matrix& Matrix::operator = (const Matrix& other) {
-    if (this == &other)
-        return *this;
-    for (long long i = 0; i < size_m; i++) {
-        for (long long j = 0; j < size_n; j++)
-            array[i][j] = other.array[i][j];
-    }
-    return *this;
-}
-
-double Matrix::ScalarProduct(Matrix Y, long long index1, long long index2) {
-    double res = 0;
-    for (long long j = 0; j < size_n; j++)
-        res += array[index1][j] * Y.array[index2][j];
-    return res;
-}
-
-double Matrix::Norm(long long index) {
-    double res = 0;
-    for (long long j = 0; j < size_n; j++)
-        res += array[index][j] * array[index][j];
-    return res;
-}
-
-void Matrix::Swap(long long index1, long long index2) {
-    double* temp = new double[size_n];
-    for (long long j = 0; j < size_n; j++) {
-        temp[j] = array[index2][j];
-        array[index2][j] = array[index1][j];
-        array[index1][j] = temp[j];
-    }
-}
-
-Matrix Matrix::ortho_GS(Matrix& coeff) {
-    Matrix Y(size_m, size_n);
-    for (long long x = 0; x < size_n; x++)
-        Y.array[0][x] = array[0][x];
-    double* B = new double[size_m];
-    B[0] = Y.Norm(0);
-    for (long long i = 1; i < size_m; i++) {
-        for (long long x = 0; x < size_n; x++)
-            Y.array[i][x] = array[i][x];
-        for (long long j = 0; j < i; j++) {
-            coeff.array[i][j] = ScalarProduct(Y, i, j) / B[j];
-            for (long long x = 0; x < size_n; x++)
-                Y.array[i][x] -= coeff.array[i][j] * Y.array[j][x];
-        }
-        B[i] = Y.Norm(i);
-    }
-    return Y;
-}
-
+// LLL algorithm realization
 void LLL(Matrix& X, double delta) {
     Matrix Y(X.size_m, X.size_n);
     Matrix coeff(X.size_m, X.size_m);
     Y = X.ortho_GS(coeff);
-    long long k = 1;
+    SIZE k = 1;
     while (k < X.size_m) {
-        for (long long j = k - 1; j >= 0; j--) {
+        for (SIZE j = k - 1; j >= 0; j--) {
             if (fabs(coeff.array[k][j]) > 0.5) {
-                for (long long x = 0; x < X.size_n; x++)
-                    X.array[k][x] -= round(coeff.array[k][j]) * X.array[j][x];
+				X.SubstractVectorWithMultiplier(round(coeff.array[k][j]), k, j);
                 Y = X.ortho_GS(coeff);
             }
         }
@@ -140,7 +27,142 @@ void LLL(Matrix& X, double delta) {
     }
 }
 
+// --------------------HELP METHODS--------------------
+
+// Gram-Schmidt orthogonalization
+Matrix Matrix::ortho_GS(Matrix& coeff) {
+    Matrix Y(size_m, size_n);
+	Y.AssignVector(*this, 0);
+    ARRAY B = new ELEMENT[size_m];
+    B[0] = Y.Norm(0);
+    for (SIZE i = 1; i < size_m; i++) {
+		Y.AssignVector (*this, i);
+        for (SIZE j = 0; j < i; j++) {
+            coeff.array[i][j] = ScalarProduct(Y, i, j) / B[j];
+			Y.SubstractVectorWithMultiplier(coeff.array[i][j], i, j);
+        }
+        B[i] = Y.Norm(i);
+    }
+    return Y;
+}
+// Constructor for object creating
+Matrix::Matrix(SIZE size_m, SIZE size_n) {
+    this->size_m = size_m;
+    this->size_n = size_n;
+    array = new ARRAY [size_m];
+    if (array == nullptr) {
+        cout << "Memory 1 error\n";
+        system("pause");
+        exit(1);
+    }
+    for (SIZE i = 0; i < size_m; i++) {
+        array[i] = new ELEMENT[size_n];
+        if (array[i] == nullptr) {
+            cout << i << "Memory 2 error\n";
+            system("pause");
+            exit(2);
+        }
+    }
+    for (SIZE i = 0; i < size_m; i++) {
+        for (SIZE j = 0; j < size_n; j++)
+            array[i][j] = 0;
+    }
+}
+
+// Copy constructor
+Matrix::Matrix(const Matrix& other) {
+    size_m = other.size_m;
+    size_n = other.size_n;
+    array = new ARRAY [size_m];
+    if (array == nullptr) {
+        cout << "Memory 1 error\n";
+        system("pause");
+        exit(1);
+    }
+    for (SIZE i = 0; i < size_m; i++) {
+        array[i] = new ELEMENT[size_n];
+        if (array[i] == nullptr) {
+            cout << i << "Memory 2 error\n";
+            system("pause");
+            exit(2);
+        }
+    }
+    for (SIZE i = 0; i < size_m; i++) {
+        for (SIZE j = 0; j < size_n; j++)
+            array[i][j] = other.array[i][j];
+    }
+}
+
+// Matrix input
+void Matrix::write(istream &in) {
+    for (SIZE i = 0; i < size_m; i++) {
+        for (SIZE j = 0; j < size_n; j++)
+            in >> array[i][j];
+    }
+}
+
+// Matrix output
+void Matrix::print(ostream &out) {
+    for (SIZE i = 0; i < size_m; i++) {
+        for (SIZE j = 0; j < size_n; j++)
+            out << array[i][j] << " ";
+        out << endl;
+    }
+}
+
+// Matrix assignment
+Matrix& Matrix::operator = (const Matrix& other) {
+    if (this == &other)
+        return *this;
+    for (SIZE i = 0; i < size_m; i++) {
+        for (SIZE j = 0; j < size_n; j++)
+            array[i][j] = other.array[i][j];
+    }
+    return *this;
+}
+
+// Calculates scalar product vectors of matrix
+double Matrix::ScalarProduct(Matrix Y, SIZE index1, SIZE index2) {
+    double res = 0;
+    for (SIZE j = 0; j < size_n; j++)
+        res += array[index1][j] * Y.array[index2][j];
+    return res;
+}
+
+// Calculates norm vectors of matrix
+double Matrix::Norm(SIZE index) {
+    double res = 0;
+    for (SIZE j = 0; j < size_n; j++)
+        res += array[index][j] * array[index][j];
+    return res;
+}
+
+// Swaps vectors of matrix
+void Matrix::Swap(SIZE index1, SIZE index2) {
+    ARRAY temp = new ELEMENT[size_n];
+    for (SIZE j = 0; j < size_n; j++) {
+        temp[j] = array[index2][j];
+        array[index2][j] = array[index1][j];
+        array[index1][j] = temp[j];
+    }
+}
+
+// Assigns basis vector values of another basis vector
+void Matrix::AssignVector (Matrix& X, SIZE index) {
+	for (SIZE j = 0; j < size_n; j++) {
+		array[index][j] = X.array[index][j];
+	}
+}
+
+// Assigns basis vector values according to the formula: [A = A - multiplier * B], where B is another basis vector
+void Matrix::SubstractVectorWithMultiplier(double mult, SIZE index1, SIZE index2) {
+	for (SIZE j = 0; j < size_n; j++) {
+		array[index1][j] -= mult * array[index2][j];
+	}
+}
+
+// Destructor
 Matrix::~Matrix() {
-    for (long long i = 0; i < size_m; i++) delete[] array[i];
+    for (SIZE i = 0; i < size_m; i++) delete[] array[i];
     delete[] array;
 }
