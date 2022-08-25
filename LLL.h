@@ -3,30 +3,40 @@
 
 
 #include <iostream>
-#include <ctime>
-#include <cmath>
 #include <fstream>
+#include <cmath>
+
+typedef long long SIZE;
+typedef double** MATRIX;
+typedef double* ARRAY;
+typedef double ELEMENT;
 
 using namespace std;
 
+// Matrix class is created for work with lattice basis (prototype)
 class Matrix;
+// LLL algorithm realization (prototype of function)
 void LLL(Matrix& X, double delta = 0.75);
 
+// Matrix class is created for work with lattice basis
 class Matrix {
-    double** array;
-    long long size_m, size_n;
+    MATRIX array;																// Array of basis vectors. Presented as a matrix of coordinates
+    SIZE size_m, size_n; 														// Dimensions of matrix
 public:
-	Matrix(long long size_m, long long size_n);
-	Matrix(const Matrix& other);
-    void write(istream &in);
-	void print(ostream &out);
-	Matrix& operator = (const Matrix& other);
-	double ScalarProduct(Matrix Y, long long index1, long long index2);
-	double Norm(long long index);
-	void Swap(long long index1, long long index2);
-	Matrix ortho_GS(Matrix& coeff);
-	friend void LLL(Matrix& X, double delta);
+	Matrix(SIZE size_m, SIZE size_n);											// Constructor for object creating
+	Matrix(const Matrix& other);												// Copy constructor
+    void write(istream &in);													// Matrix input
+	void print(ostream &out);													// Matrix output
+	friend void LLL(Matrix& X, double delta);									// LLL algorithm realization - CORE OF PROGRAM
 	~Matrix();
+private:																		// --------------HELP METHODS--------------
+	Matrix ortho_GS(Matrix& coeff);												// Gram-Schmidt orthogonalization
+	Matrix& operator = (const Matrix& other);									// Matrix assignment
+	void AssignVector (Matrix& X, SIZE index);									// Assigns basis vector values of another basis vector
+	void SubstractVectorWithMultiplier(double mult, SIZE index1, SIZE index2);	// Assigns basis vector values according to the formula: [A = A - multiplier * B], where B is another basis vector
+	double ScalarProduct(Matrix Y, SIZE index1, SIZE index2);					// Calculates scalar product vectors of matrix
+	double Norm(SIZE index);													// Calculates norm vectors of matrix
+	void Swap(SIZE index1, SIZE index2);										// Swaps vectors of matrix
 };
 
 
