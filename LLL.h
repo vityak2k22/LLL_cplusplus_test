@@ -29,7 +29,7 @@ public:
 	void print(ostream &out);													// Matrix output
 	friend void LLL(Matrix& X, double delta);									// LLL algorithm realization - CORE OF PROGRAM
 	~Matrix();
-private:																		// --------------HELP METHODS--------------
+private:
 	Matrix ortho_GS(Matrix& coeff);												// Gram-Schmidt orthogonalization
 	Matrix& operator = (const Matrix& other);									// Matrix assignment
 	void AssignVector (Matrix& X, SIZE index);									// Assigns basis vector values of another basis vector
