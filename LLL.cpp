@@ -6,13 +6,13 @@
 void LLL(Matrix& X, double delta) {
     Matrix Y(X.size_m, X.size_n);
     Matrix coeff(X.size_m, X.size_m);
-    Y = X.ortho_GS(coeff);
+    Y.ortho_GS(X, coeff);
     SIZE k = 1;
     while (k < X.size_m) {
         for (SIZE j = k - 1; j >= 0; j--) {
             if (fabs(coeff.array[k][j]) > 0.5) {
 				X.SubstractVectorWithMultiplier(round(coeff.array[k][j]), k, j);
-                Y = X.ortho_GS(coeff);
+                Y.ortho_GS(X, coeff);
             }
         }
         double a = (delta - coeff.array[k][k - 1] * coeff.array[k][k - 1]) * Y.Norm(k - 1);
@@ -21,7 +21,7 @@ void LLL(Matrix& X, double delta) {
             k++;
         else {
             X.Swap(k, k - 1);
-            Y = X.ortho_GS(coeff);
+            Y.ortho_GS(X, coeff);
             k = (k - 1 > 1 ? k - 1 : 1);
         }
     }
@@ -30,21 +30,20 @@ void LLL(Matrix& X, double delta) {
 // --------------------HELP METHODS--------------------
 
 // Gram-Schmidt orthogonalization
-Matrix Matrix::ortho_GS(Matrix& coeff) {
-    Matrix Y(size_m, size_n);
-	Y.AssignVector(*this, 0);
+void Matrix::ortho_GS(Matrix& X, Matrix& coeff) {
+	AssignVector(X, 0);
     ARRAY B = new ELEMENT[size_m];
-    B[0] = Y.Norm(0);
+    B[0] = Norm(0);
     for (SIZE i = 1; i < size_m; i++) {
-		Y.AssignVector (*this, i);
+		AssignVector(X, i);
         for (SIZE j = 0; j < i; j++) {
-            coeff.array[i][j] = ScalarProduct(Y, i, j) / B[j];
-			Y.SubstractVectorWithMultiplier(coeff.array[i][j], i, j);
+            coeff.array[i][j] = ScalarProduct(*this, i, j) / B[j];
+			SubstractVectorWithMultiplier(coeff.array[i][j], i, j);
         }
-        B[i] = Y.Norm(i);
+        B[i] = Norm(i);
     }
-    return Y;
 }
+
 // Constructor for object creating
 Matrix::Matrix(SIZE size_m, SIZE size_n) {
     this->size_m = size_m;
