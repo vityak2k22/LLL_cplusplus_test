@@ -109,17 +109,6 @@ void Matrix::print(ostream &out) {
     }
 }
 
-// Matrix assignment
-Matrix& Matrix::operator = (const Matrix& other) {
-    if (this == &other)
-        return *this;
-    for (SIZE i = 0; i < size_m; i++) {
-        for (SIZE j = 0; j < size_n; j++)
-            array[i][j] = other.array[i][j];
-    }
-    return *this;
-}
-
 // Calculates scalar product vectors of matrix
 double Matrix::ScalarProduct(Matrix Y, SIZE index1, SIZE index2) {
     double res = 0;

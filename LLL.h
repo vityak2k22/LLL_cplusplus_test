@@ -29,7 +29,6 @@ public:
 	~Matrix();
 private:										// --------------HELP METHODS--------------
 	void ortho_GS(Matrix& X, Matrix& coeff);					// Gram-Schmidt orthogonalization
-	Matrix& operator = (const Matrix& other);					// Matrix assignment
 	void AssignVector (Matrix& X, SIZE index);					// Assigns basis vector values of another basis vector
 	void SubstractVectorWithMultiplier(double mult, SIZE index1, SIZE index2);	// Assigns basis vector values according to the formula: [A = A - multiplier * B], where B is another basis vector
 	double ScalarProduct(Matrix Y, SIZE index1, SIZE index2);			// Calculates scalar product vectors of matrix
